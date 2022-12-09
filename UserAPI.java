@@ -1,6 +1,17 @@
 import java.util.ArrayList;
 import java.util.List;
 
+/* API CALL GUIDE:
+ * 0 -> register(String username, String password) -> int
+ * 1 -> login(String username, String password) -> Boolean
+ * 2 -> get_available(Pos current) -> List<Pos>
+ * 3 -> check_rewards(Pos current) -> List<Reward>
+ * 4 -> reserve_scooter(Pos start) -> Reserve
+ * 5 -> park_scooter(Pos end, int code) -> Price
+ * 6 -> set_notification(Boolean on, Pos desired) -> Boolean
+ * 7 -> receive_notifications() -> Reward
+ */
+
 public class UserAPI {
 
     private Demultiplexer demultiplexer;
@@ -121,5 +132,102 @@ public class UserAPI {
 
         // Return list of rewards
         return list;
+    }
+
+    public Reserve reserve_scooter(Pos start){
+        
+        // Create data camp of frame
+        byte[] data = start.toString().getBytes();
+
+        // Create a frame with frameType 4 and send it trough the demultiplexer
+        Frame request = new Frame(4, data);
+        demultiplexer.send(request);
+
+        // Receive a frame from the demultiplexer
+        Frame response = demultiplexer.receive(4);
+        String out = new String(response.getData());
+
+        // Parse reserve from string
+        String[] reserve = out.split(";");
+        int code = Integer.parseInt(reserve[0]);
+        int x = Integer.parseInt(reserve[1]);
+        int y = Integer.parseInt(reserve[2]);
+        String datetime = reserve[3];
+
+        // Return reserve
+        return new Reserve(code, new Pos(x, y), datetime);
+    }
+
+    public Price park_scooter(Pos end, int code){
+        
+        // Create data camp of frame
+        StringBuilder in = new StringBuilder();
+        in.append(end.toString());
+        in.append(";");
+        in.append(code);
+        byte[] data = in.toString().getBytes();
+
+        // Create a frame with frameType 5 and send it trough the demultiplexer
+        Frame request = new Frame(5, data);
+        demultiplexer.send(request);
+
+        // Receive a frame from the demultiplexer
+        Frame response = demultiplexer.receive(5);
+        String out = new String(response.getData());
+
+        // Parse price from string
+        String[] price = out.split(";");
+        double amount = Double.parseDouble(price[0]);
+        double discount = Double.parseDouble(price[1]);
+
+        // Return price
+        return new Price(amount, discount);
+    }
+
+    public boolean set_notifications(Pos desired, Boolean on){
+            
+        // Create data camp of frame
+        StringBuilder in = new StringBuilder();
+        in.append(desired.toString());
+        in.append(";");
+        in.append(on);
+        byte[] data = in.toString().getBytes();
+
+        // Create a frame with frameType 6 and send it trough the demultiplexer
+        Frame request = new Frame(6, data);
+        demultiplexer.send(request);
+
+        // Receive a frame from the demultiplexer
+        Frame response = demultiplexer.receive(6);
+        String out = new String(response.getData());
+
+        // Parse response value
+        try {
+            return (1==Integer.parseInt(out));
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public Reward receive_notifications(){
+            
+        // Create a frame with frameType 7 and send it trough the demultiplexer
+        Frame request = new Frame(7, null);
+        demultiplexer.send(request);
+
+        // Receive a frame from the demultiplexer
+        Frame response = demultiplexer.receive(7);
+        String out = new String(response.getData());
+
+        // Parse reward from string
+        String[] reward = out.split(",");
+        int x1 = Integer.parseInt(reward[0]);
+        int y1 = Integer.parseInt(reward[1]);
+        int x2 = Integer.parseInt(reward[2]);
+        int y2 = Integer.parseInt(reward[3]);
+        double discount = Double.parseDouble(reward[4]);
+
+        // Return reward
+        return new Reward(new Pos(x1, y1), new Pos(x2, y2), discount);
     }
 }
