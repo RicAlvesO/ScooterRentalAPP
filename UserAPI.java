@@ -1,3 +1,5 @@
+import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,10 +16,12 @@ import java.util.List;
 
 public class UserAPI {
 
+    private Connection con;
     private Demultiplexer demultiplexer;
 
-    public UserAPI(Demultiplexer demu){
-        this.demultiplexer=demu;
+    public UserAPI(Socket s) throws IOException{
+        this.con = new Connection(s);
+        this.demultiplexer=new Demultiplexer(this.con);
     }
 
     public int register(String username, String password) {
@@ -31,16 +35,18 @@ public class UserAPI {
 
         // Create a frame with frameType 0 and send it trough the demultiplexer
         Frame request = new Frame(0, data);
-        demultiplexer.send(request);
-
-        // Receive a frame from the demultiplexer
-        Frame response = demultiplexer.receive(0);
-        String out = new String(response.getData());
-
-        // Parse the response value
+        if (1==demultiplexer.send(request)){
+            return -1;
+        }
+        
         try {
+            // Receive a frame from the demultiplexer
+            Frame response = demultiplexer.receive(0);
+            String out = new String(response.getData());
+
+            // Parse the response value
             return Integer.parseInt(out);
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             return -1;
         }
     }
@@ -56,16 +62,18 @@ public class UserAPI {
         
         // Create a frame with frameType 1 and send it trough the demultiplexer
         Frame request = new Frame(1, data);
-        demultiplexer.send(request);
+        if (1==demultiplexer.send(request)){
+            return false;
+        }
 
-        // Receive a frame from the demultiplexer
-        Frame response = demultiplexer.receive(1);
-        String out = new String(response.getData());
-
-        // Parse the response value
         try {
+            // Receive a frame from the demultiplexer
+            Frame response = demultiplexer.receive(1);
+            String out = new String(response.getData());
+
+            // Parse the response value
             return (1==Integer.parseInt(out));
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             return false;
         }
     }
@@ -77,10 +85,17 @@ public class UserAPI {
 
         // Create a frame with frameType 2 and send it trough the demultiplexer
         Frame request = new Frame(2, data);
-        demultiplexer.send(request);
+        if (1==demultiplexer.send(request)){
+            return null;
+        }
 
         // Receive a frame from the demultiplexer
-        Frame response = demultiplexer.receive(2);
+        Frame response;
+        try {
+            response = demultiplexer.receive(2);
+        } catch (Exception e) {
+            return null;
+        }
         String out = new String(response.getData());
 
         // Build list of available positions
@@ -107,10 +122,17 @@ public class UserAPI {
 
         // Create a frame with frameType 3 and send it trough the demultiplexer
         Frame request = new Frame(3, data);
-        demultiplexer.send(request);
+        if (1 == demultiplexer.send(request)) {
+            return null;
+        }
 
         // Receive a frame from the demultiplexer
-        Frame response = demultiplexer.receive(3);
+        Frame response;
+        try {
+            response = demultiplexer.receive(3);
+        } catch (Exception e) {
+            return null;
+        }
         String out = new String(response.getData());
 
         // Build list of rewards
@@ -141,10 +163,17 @@ public class UserAPI {
 
         // Create a frame with frameType 4 and send it trough the demultiplexer
         Frame request = new Frame(4, data);
-        demultiplexer.send(request);
+        if (1==demultiplexer.send(request)){
+            return null;
+        }
 
         // Receive a frame from the demultiplexer
-        Frame response = demultiplexer.receive(4);
+        Frame response;
+        try {
+            response = demultiplexer.receive(4);
+        } catch (Exception e) {
+            return null;
+        }
         String out = new String(response.getData());
 
         // Parse reserve from string
@@ -169,10 +198,17 @@ public class UserAPI {
 
         // Create a frame with frameType 5 and send it trough the demultiplexer
         Frame request = new Frame(5, data);
-        demultiplexer.send(request);
+        if (1 == demultiplexer.send(request)) {
+            return null;
+        }
 
         // Receive a frame from the demultiplexer
-        Frame response = demultiplexer.receive(5);
+        Frame response;
+        try {
+            response = demultiplexer.receive(5);
+        } catch (Exception e) {
+            return null;
+        }
         String out = new String(response.getData());
 
         // Parse price from string
@@ -195,10 +231,17 @@ public class UserAPI {
 
         // Create a frame with frameType 6 and send it trough the demultiplexer
         Frame request = new Frame(6, data);
-        demultiplexer.send(request);
+        if (1==demultiplexer.send(request)){
+            return false;
+        }
 
         // Receive a frame from the demultiplexer
-        Frame response = demultiplexer.receive(6);
+        Frame response;
+        try {
+            response = demultiplexer.receive(2);
+        } catch (Exception e) {
+            return false;
+        }
         String out = new String(response.getData());
 
         // Parse response value
@@ -213,10 +256,17 @@ public class UserAPI {
             
         // Create a frame with frameType 7 and send it trough the demultiplexer
         Frame request = new Frame(7, null);
-        demultiplexer.send(request);
+        if (1 == demultiplexer.send(request)) {
+            return null;
+        }
 
         // Receive a frame from the demultiplexer
-        Frame response = demultiplexer.receive(7);
+        Frame response;
+        try {
+            response = demultiplexer.receive(7);
+        } catch (Exception e) {
+            return null;
+        }
         String out = new String(response.getData());
 
         // Parse reward from string
