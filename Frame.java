@@ -1,13 +1,9 @@
 public class Frame {
     private int frameType;
-    private int tag; //adicionei pq nao tinha
-    private int length; // adicionaue pq é preciso para criar o array de bytes
     private byte[] data;
 
-    public Frame(int frameType, byte[] data, int tag) {
+    public Frame(int frameType, byte[] data) {
         this.frameType = frameType;
-        this.tag = tag;
-        this.length = data.length;
         this.data = data;
     }
 
@@ -15,12 +11,8 @@ public class Frame {
         return frameType;
     }
 
-    public int getTag() {
-        return tag;
-    }
-
     public int getLength() {
-        return length;
+        return this.data.length;
     }
 
     public byte[] getData() {

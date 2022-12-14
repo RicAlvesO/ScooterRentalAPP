@@ -21,26 +21,24 @@ public class Connection {
     public void send(Frame f) throws IOException{
         wlock.lock();
         out.writeInt(f.getFrameType());
-        out.writeInt(f.getTag());
         out.writeInt(f.getLength());
         out.write(f.getData());
         out.flush();
         wlock.unlock();
     }
 
-    public void send(int frameType, byte[] data, int tag) throws IOException{
-        send(new Frame(frameType, data, tag));
+    public void send(int frameType, byte[] data) throws IOException{
+        send(new Frame(frameType, data));
     }
 
     public Frame receive() throws IOException{
         rlock.lock();
         int frameType = in.readInt();
-        int tag = in.readInt();
         int length = in.readInt();
         byte[] data = new byte[length];
         in.readFully(data);
         rlock.unlock();
-        return new Frame(frameType, data, tag);
+        return new Frame(frameType, data);
     }
 
     public boolean close(){

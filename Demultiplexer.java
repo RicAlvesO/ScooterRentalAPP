@@ -15,8 +15,8 @@ public class Demultiplexer {
 
     public void send(Frame f) throws IOException {
         this.lock.lock();
-        if (this.despertadores.containsKey(f.getTag())==false) {
-            this.despertadores.put(f.getTag(), new Alarm());
+        if (this.despertadores.containsKey(f.getFrameType())==false) {
+            this.despertadores.put(f.getFrameType(), new Alarm());
         }
         this.lock.unlock();
         con.send(f);
