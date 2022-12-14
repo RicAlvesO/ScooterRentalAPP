@@ -13,13 +13,18 @@ public class Demultiplexer {
         this.con = con;
     }
 
-    public void send(Frame f) throws IOException {
+    public int send(Frame f){
         this.lock.lock();
         if (this.despertadores.containsKey(f.getFrameType())==false) {
             this.despertadores.put(f.getFrameType(), new Alarm());
         }
         this.lock.unlock();
-        con.send(f);
+        try {
+            con.send(f);
+            return 0;
+        } catch (IOException e) {
+            return 1;
+        }
     }
 
     public Frame receive(int tag) throws InterruptedException {
