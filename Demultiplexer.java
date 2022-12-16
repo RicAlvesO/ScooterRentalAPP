@@ -7,16 +7,30 @@ public class Demultiplexer {
 
     private final Connection con;
     private final ReentrantLock lock = new ReentrantLock();
-    private Map <Integer, Alarm> despertadores = new HashMap<>();
+    private Map <Integer, Alarm> alarms = new HashMap<>();
 
     public Demultiplexer(Connection con) {
         this.con = con;
     }
 
+    public void start() {
+        new Thread(() -> {
+            while (true) {
+                try {
+                    Frame frame = con.receive();
+                    Alarm a = this.alarms.get(frame.getFrameType());
+                    a.push(frame);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
     public int send(Frame f){
         this.lock.lock();
-        if (this.despertadores.containsKey(f.getFrameType())==false) {
-            this.despertadores.put(f.getFrameType(), new Alarm());
+        if (this.alarms.containsKey(f.getFrameType())==false) {
+            this.alarms.put(f.getFrameType(), new Alarm());
         }
         this.lock.unlock();
         try {
@@ -28,8 +42,8 @@ public class Demultiplexer {
     }
 
     public Frame receive(int tag) throws InterruptedException {
-        Alarm d = this.despertadores.get(tag);
-        Frame f = d.poll();
+        Alarm al = this.alarms.get(tag);
+        Frame f = al.poll();
         return f;
     }
 
