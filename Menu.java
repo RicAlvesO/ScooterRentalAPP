@@ -1,3 +1,4 @@
+import java.net.Socket;
 import java.security.Principal;
 import java.security.cert.CRL;
 import java.util.List;
@@ -32,7 +33,7 @@ public class Menu
                 System.out.print("  Indique o password: ");
                 password = scanner.next();
                 
-                int id = register(username, password);
+                int id = register(new User(username, password));
 
                 System.out.println(("  \n\n << Você foi registado e o seu ID é: " + id + " >>\n\n"));
                 System.out.println("---------------------------------------------------\n");
@@ -158,7 +159,7 @@ public class Menu
                     Pos posS = new Pos(x, y);
 
                     Reserve reserve = reserve_scooter(posS);
-
+                    reserveList.put(reserve.getCode(), reserve);
                     System.out.println(reserve.toString());
                     System.out.println("------------------------------------------\n");
 
@@ -182,8 +183,10 @@ public class Menu
 
                     System.out.print(("  Indique o códico da reserva: "));
                     int code = scanner.nextInt();
+                    Reserve resv = reserveList.get(code);
+                    resv.setEnd(end);
 
-                    Price price = park_scooter(end, code);
+                    Price price = park_scooter(resv);
 
                     System.out.println("O preço é: " + price.toString());
                     System.out.println("---------------------------------------------\n");
@@ -205,16 +208,7 @@ public class Menu
                     y = scanner.nextInt();
 
                     Pos desired = new Pos(x, y);
-                    boolean onoff = false;
-
-                    System.out.print("  Digite 'T' se você deseja ativar as notificações\n  Digite 'F' se você deseja desativar as notificações\n    --> ");
-                    String resB = "";
-                    while (!(resB.equals("T") || resB.equals("F")))
-                    {
-                        resB = scanner.next();
-                        if(resB.equals("T")) onoff = set_notification(true, desired);
-                        else onoff = set_notification(false, desired);
-                    }
+                    boolean onoff = set_notification(desired);
 
                     if(onoff == true) System.out.println("\n  As notificações da posiçåo (" + x + "," + y + ") estão ativadas!\n");
                     else System.out.println("\n  As notificações da posiçåo (" + x + "," + y + ") estão desativadas!\n");
@@ -252,9 +246,6 @@ public class Menu
 
     public static void clearWindow() 
     {
-        for (int i = 0;i<100;i++)
-        {
-            System.out.println();
-        }
+        System.out.println("\033[H\033[2J");
     }
 }

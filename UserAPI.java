@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /* API CALL GUIDE:
- * 0 -> register(String username, String password) -> int
- * 1 -> login(String username, String password) -> Boolean
+ * 0 -> register(User user) -> int
+ * 1 -> login(User) -> Boolean
  * 2 -> get_available(Pos current) -> List<Pos>
  * 3 -> check_rewards(Pos current) -> List<Reward>
  * 4 -> reserve_scooter(Pos start) -> Reserve
- * 5 -> park_scooter(Pos end, int code) -> Price
- * 6 -> set_notification(Boolean on, Pos desired) -> Boolean
+ * 5 -> park_scooter(Reserve) -> Price
+ * 6 -> set_notification(Pos desired) -> Boolean
  * 7 -> receive_notifications() -> Reward
  */
 
@@ -24,10 +24,10 @@ public class UserAPI {
         this.demultiplexer=new Demultiplexer(this.con);
     }
 
-    public int register(User u) {
+    public int register(User user) {
 
         // Create a frame with frameType 0 and send it trough the demultiplexer
-        Frame request = new Frame(0, u);
+        Frame request = new Frame(0, user);
         if (1==demultiplexer.send(request)){
             return -1;
         }
@@ -43,10 +43,10 @@ public class UserAPI {
         }
     }
 
-    public Boolean login(User u) {
+    public Boolean login(User user) {
         
         // Create a frame with frameType 1 and send it trough the demultiplexer
-        Frame request = new Frame(1, u);
+        Frame request = new Frame(1, user);
         if (1==demultiplexer.send(request)){
             return false;
         }
