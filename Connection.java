@@ -6,16 +6,18 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Connection {
 
-    private final Socket socket;
-    private final ObjectInputStream in;
-    private final ObjectOutputStream out;
-    private final ReentrantLock wlock = new ReentrantLock();
-    private final ReentrantLock rlock = new ReentrantLock();
+    private Socket socket;
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
+    private ReentrantLock wlock;
+    private ReentrantLock rlock;
 
     public Connection(Socket socket) throws IOException{
         this.socket = socket;
         this.in = new ObjectInputStream(socket.getInputStream());
         this.out = new ObjectOutputStream(socket.getOutputStream());
+        this.wlock = new ReentrantLock();
+        this.rlock = new ReentrantLock();
     }
 
     public void send(Frame f) throws IOException{

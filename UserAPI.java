@@ -23,6 +23,7 @@ public class UserAPI {
     public UserAPI(Socket s) throws IOException{
         this.con = new Connection(s);
         this.demultiplexer=new Demultiplexer(this.con);
+        System.out.println("Connection established");
     }
 
     public int register(String username, String password) {

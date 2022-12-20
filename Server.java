@@ -1,29 +1,31 @@
 import java.net.ServerSocket;
 
 public class Server {
-    // Echo Java server receiving connections from clients on port 12345 in localhost
-    // For each connection, the server creates a new thread to handle the client
-    // The server is stopped by typing "shutdown" in the console
-    public static void main(String[] args) {
-        ServerSocket serverSocket = null;
-        boolean listening = true;
+    
+    private ServerSocket serverSocket;
+    private boolean running;
+
+    public Server() {
         try {
-            serverSocket = new ServerSocket(12345);
+            this.serverSocket = new ServerSocket(12345);
+            this.running = true;
         } catch (Exception e) {
             System.err.println("Could not listen on port: 12345.");
-            System.exit(-1);
+            System.exit(1);
         }
-        System.out.println("Server is running");
-        while (listening)
+    }
+
+    public void acceptConnections() {
+        while (running) {
             try {
                 new Thread(new ClientHandler(serverSocket.accept())).start();
-                System.out.println("New connection");
             } catch (Exception e) {
-                System.err.println("Accept failed.");
-                System.exit(-1);
+                e.printStackTrace();
+                running = false;
             }
+        }
         try {
-            serverSocket.close();
+            this.serverSocket.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -13,9 +13,9 @@ public class ClientHandler implements Runnable{
     public ClientHandler(Socket socket) {
         try {
             this.socket = socket;
-            out = new ObjectOutputStream(socket.getOutputStream());
-            in = new ObjectInputStream(socket.getInputStream());
-            running = true;
+            this.out = new ObjectOutputStream(socket.getOutputStream());
+            this.in = new ObjectInputStream(socket.getInputStream());
+            this.running = true;
         } catch (Exception e) {
             System.out.println("Error in ClientHandler constructor: " + e.getMessage());
         }
@@ -28,21 +28,38 @@ public class ClientHandler implements Runnable{
                 Frame msg = (Frame) in.readObject();
                 if (msg.getFrameType() == -1) {
                     running = false;
-                    socket.close();
                     System.out.println("Connection closed");
                     return;
+                }else if(msg.getFrameType() >= 0 && msg.getFrameType() <= 7){
+                    this.handleQuery(msg);
                 }
-                System.out.println(msg.getFrameType());
             }catch (Exception e) {
                 running = false;
-                try {
-                    socket.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
                 System.out.println("Connection closed");
                 return;
             }
         }
+        try {
+            this.socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Connection closed");
+
+    }
+
+    public void handleQuery(Frame f){
+        System.out.println("Received: " + f.getFrameType());
+    }
+
+    public boolean send(Frame msg){
+        try {
+            out.writeObject(msg);
+            return true;
+        } catch (IOException e) {
+            running = false;
+            return false;
+        }
     }
 }
+
