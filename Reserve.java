@@ -1,4 +1,5 @@
 import java.io.DataOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 
 public class Reserve{
@@ -58,4 +59,18 @@ public class Reserve{
         }
         out.writeUTF(r.getDatetime());
     } 
+
+    public static Reserve deserialize(DataInputStream in) throws IOException {
+        int code = in.readInt();
+        int x1 = in.readInt();
+        int y1 = in.readInt();
+        int x2 = in.readInt();
+        int y2 = in.readInt();
+        String datetime = in.readUTF();
+        Reserve r = new Reserve(code, new Pos(x1, y1), datetime);
+        if (x2 != -1 && y2 != -1){
+            r.setEnd(new Pos(x2, y2));
+        }
+        return r;
+    }
 }

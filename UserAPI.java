@@ -41,7 +41,7 @@ public class UserAPI {
             Frame response = demultiplexer.receive(0);
             System.out.println(response.getFrameType());
             // Parse the response value
-            return ((User)response.getData()).getId();
+            return (Integer)response.getData();
         } catch (Exception e) {
             return -1;
         }

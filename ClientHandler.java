@@ -23,8 +23,13 @@ public class ClientHandler implements Runnable{
                     return;
                 }else if(msg.getFrameType() >= 0 && msg.getFrameType() <= 7){
                     this.handleQuery(msg);
+                }else if(msg==null){
+                    running = false;
+                    System.out.println("Connection closed by client");
+                    return;
                 }
             }catch (Exception e) {
+                con.close();
                 System.out.println("Connection closed by client error");
                 return;
             }
@@ -37,7 +42,9 @@ public class ClientHandler implements Runnable{
     public void handleQuery(Frame f){
         System.out.println("Received: " + f.getFrameType());
         try {
-            this.con.send(f);
+            if (f.getFrameType()==0){
+                this.con.send(new Frame(0,true,1));
+            }
         } catch (Exception e) {
             System.out.println("Error in handleQuery: " + e.getMessage());
         }

@@ -1,4 +1,5 @@
 import java.io.DataOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 
 public class Pos {
@@ -22,5 +23,11 @@ public class Pos {
     public static void serialize(Pos p,DataOutputStream out) throws IOException {
         out.writeInt(p.getX());
         out.writeInt(p.getY());
+    }
+
+    public static Pos deserialize(DataInputStream in) throws IOException {
+        int x = in.readInt();
+        int y = in.readInt();
+        return new Pos(x, y);
     }
 }

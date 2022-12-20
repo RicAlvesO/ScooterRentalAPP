@@ -3,6 +3,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
+import java.util.ArrayList;
 
 public class Frame{
     private int frameType;
@@ -92,7 +93,76 @@ public class Frame{
         }
     }
 
-    public static Frame deserialize(DataInputStream in) {
-        return null;
+    public static Frame deserialize(DataInputStream in) throws IOException{
+        int frameType = in.readInt();
+        boolean response = in.readBoolean();
+        Object data = null;
+        switch (frameType) {
+            case 0:
+                if (response) {
+                    data = in.readInt();
+                } else {
+                    data = User.deserialize(in);
+                }
+                break;
+            case 1:
+                if (response) {
+                    data = in.readBoolean();
+                } else {
+                    data = User.deserialize(in);
+                }
+                break;
+            case 2:
+                if (response) {
+                    int size = in.readInt();
+                    List<Pos> l = new ArrayList<Pos>(size);
+                    for (int i = 0; i < size; i++) {
+                        l.add(Pos.deserialize(in));
+                    }
+                    data=l;
+                } else {
+                    data = Pos.deserialize(in);
+                }
+                break;
+            case 3:
+                if (response) {
+                    int size = in.readInt();
+                    List<Reward> l = new ArrayList<Reward>(size);
+                    for (int i = 0; i < size; i++) {
+                        l.add(Reward.deserialize(in));
+                    }
+                    data=l;
+                } else {
+                    data = Pos.deserialize(in);
+                }
+                break;
+            case 4:
+                if (response) {
+                    data = Reserve.deserialize(in);
+                } else {
+                    data = Pos.deserialize(in);
+                }
+                break;
+            case 5:
+                if (response) {
+                    data = Price.deserialize(in);
+                } else {
+                    data = Reserve.deserialize(in);
+                }
+                break;
+            case 6:
+                if (response) {
+                    data = in.readBoolean();
+                } else {
+                    data = Pos.deserialize(in);
+                }
+                break;
+            case 7:
+                if (response) {
+                    data = Reward.deserialize(in);
+                }
+                break;
+        }
+        return new Frame(frameType, response, data);
     }
 }

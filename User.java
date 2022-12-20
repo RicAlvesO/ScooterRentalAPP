@@ -1,4 +1,5 @@
 import java.io.DataOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 
 public class User{
@@ -37,5 +38,14 @@ public class User{
         out.writeUTF(u.getName());
         out.writeUTF(u.getPassword());
         out.writeInt(u.getId());
+    }
+
+    public static User deserialize(DataInputStream in) throws IOException {
+        String name = in.readUTF();
+        String password = in.readUTF();
+        int id = in.readInt();
+        User u = new User(name, password);
+        u.setId(id);
+        return u;
     }
 }

@@ -1,4 +1,5 @@
 import java.io.DataOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 
 public class Reward{
@@ -37,5 +38,14 @@ public class Reward{
         out.writeInt(p2.getX());
         out.writeInt(p2.getY());
         out.writeDouble(r.getDiscount());
+    }
+
+    public static Reward deserialize(DataInputStream in) throws IOException {
+        int x1 = in.readInt();
+        int y1 = in.readInt();
+        int x2 = in.readInt();
+        int y2 = in.readInt();
+        double discount = in.readDouble();
+        return new Reward(new Pos(x1, y1), new Pos(x2, y2), discount);
     }
 }
