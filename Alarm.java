@@ -28,4 +28,12 @@ public class Alarm {
         this.alarm.signal();
         this.lock.unlock();
     }
+
+    public void clear(){
+        this.lock.lock();
+        if (this.queue.isEmpty() == false) {
+            this.alarm.signal();
+        }
+        this.lock.unlock();
+    }
 }

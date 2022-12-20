@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,13 +24,15 @@ public class Menu
         String username = "";
         String password = "";
 
-        while((res != 1 || res != 2) && (ok == false))
+        while((res != 1 || res != 2) && (ok == false) && api.isRunning())
         {
             clearWindow();
             System.out.println("------- Menu de login/registro --------");
-            System.out.print("  1) Registar Utilizador\n  2) Realizar Login \n 0) Sair\n\n  --> ");
-            res = scanner.nextInt();
-        
+            System.out.print("  1) Registar Utilizador\n  2) Realizar Login \n  0) Sair\n\n  --> ");
+            while ( res>2 || res<0) {
+                res = scanner.nextInt();
+            }
+
             switch(res)
             {
                 case 1:
@@ -42,9 +45,12 @@ public class Menu
 
                     int id = this.api.register(username, password);
 
-                    System.out.println(("  \n\n << Você foi registado e o seu ID é: " + id + " >>\n\n"));
-                    System.out.println("---------------------------------------------------\n");
-                    ok=true;
+                    if (id!=-1){
+                        System.out.println(("  \n\n << Você foi registado e o seu ID é: " + id + " >>\n\n"));
+                        System.out.println("---------------------------------------------------\n");
+                        ok=true;
+                    }
+                    res=-1;
                     break;
 
                 case 2:
@@ -57,13 +63,18 @@ public class Menu
 
                     ok = this.api.login(username, password);
 
-                    if(ok == false) System.out.println("  << Falha no login >>");
+                    if(ok == false) {System.out.println("  << Falha no login >>"); res=-1;}
                     else {
                         clearWindow();
                         System.out.println("  << Login efetuado com sucesso! Bem vindo " + username + "! >>\n");
                     }  
                     break;       
                 case 0:
+                    try {
+                        this.api.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     return false;
             }
 
@@ -77,7 +88,7 @@ public class Menu
 
     public void menu()
     {
-        while(true)
+        while(true && api.isRunning())
         {
             clearWindow();
             StringBuilder sb = new StringBuilder("--------------------------------- MENU ---------------------------------\n\n");
@@ -244,6 +255,11 @@ public class Menu
                    break;
                 case 0:
                     scanner.close();
+                    try {
+                        this.api.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     System.exit(0);
                     break;
             }

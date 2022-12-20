@@ -8,6 +8,7 @@ public class Demultiplexer {
     private final Connection con;
     private final ReentrantLock lock = new ReentrantLock();
     private Map <Integer, Alarm> alarms = new HashMap<>();
+    private boolean running = true;
 
     public Demultiplexer(Connection con) {
         this.con = con;
@@ -21,6 +22,9 @@ public class Demultiplexer {
                     Alarm a = this.alarms.get(frame.getFrameType());
                     a.push(frame);
                 } catch (Exception e) {
+                    System.out.println("Connection closed due to error!");
+                    running=false;
+                    con.close();
                     e.printStackTrace();
                 }
             }
@@ -37,6 +41,9 @@ public class Demultiplexer {
             con.send(f);
             return 0;
         } catch (IOException e) {
+            System.err.println("Connection closed due to error!");
+            running=false;
+            con.close();
             return 1;
         }
     }
@@ -49,5 +56,12 @@ public class Demultiplexer {
 
     public void close() {
         this.con.close();
+    }
+
+    public boolean isRunning() {
+        this.lock.lock();
+        boolean r = running;
+        this.lock.unlock();
+        return r;
     }
 }

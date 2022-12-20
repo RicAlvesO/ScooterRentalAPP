@@ -5,6 +5,7 @@ public class Main {
         UserAPI api;
         try{
             Socket socket = new Socket("localhost", 12345);
+            System.out.println("Conectado com o servidor");
             api = new UserAPI(socket);
         }catch(Exception e){
             System.out.println("Erro ao conectar com o servidor");

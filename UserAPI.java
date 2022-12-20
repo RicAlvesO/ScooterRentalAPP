@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /* API CALL GUIDE:
- * 0 -> register(User user) -> int
- * 1 -> login(User) -> Boolean
- * 2 -> get_available(Pos current) -> List<Pos>
- * 3 -> check_rewards(Pos current) -> List<Reward>
- * 4 -> reserve_scooter(Pos start) -> Reserve
- * 5 -> park_scooter(Reserve) -> Price
- * 6 -> set_notifications(Pos desired) -> Boolean
- * 7 -> receive_notifications() -> Reward
+ * -1 -> close() -> void
+ *  0 -> register(User user) -> int
+ *  1 -> login(User) -> Boolean
+ *  2 -> get_available(Pos current) -> List<Pos>
+ *  3 -> check_rewards(Pos current) -> List<Reward>
+ *  4 -> reserve_scooter(Pos start) -> Reserve
+ *  5 -> park_scooter(Reserve) -> Price
+ *  6 -> set_notifications(Pos desired) -> Boolean
+ *  7 -> receive_notifications() -> Reward
  */
 
 public class UserAPI {
@@ -176,5 +177,14 @@ public class UserAPI {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public void close() throws IOException{
+        demultiplexer.send(new Frame(-1, null));
+        demultiplexer.close();
+    }
+
+    public boolean isRunning() {
+        return demultiplexer.isRunning();
     }
 }
