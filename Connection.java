@@ -22,13 +22,13 @@ public class Connection implements AutoCloseable {
 
     public void send(Frame f) throws IOException{
         wlock.lock();
-        out.writeInt(f.getFrameType());
+        f.serialize(out);
         wlock.unlock();
     }
 
     public Frame receive() throws IOException, ClassNotFoundException{
         rlock.lock();
-        Frame fr=new Frame(in.readInt(), null);
+        Frame fr= Frame.deserialize(in);
         rlock.unlock();
         return fr;
     }

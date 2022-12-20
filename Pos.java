@@ -1,6 +1,7 @@
-import java.io.Serializable;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
-public class Pos implements Serializable{
+public class Pos {
     
     private int x;
     private int y;
@@ -16,5 +17,10 @@ public class Pos implements Serializable{
 
     public int getY() {
         return y;
+    }
+
+    public static void serialize(Pos p,DataOutputStream out) throws IOException {
+        out.writeInt(p.getX());
+        out.writeInt(p.getY());
     }
 }

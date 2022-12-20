@@ -1,6 +1,7 @@
-import java.io.Serializable;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
-public class User implements Serializable{
+public class User{
     
     private String name;
     private String password;
@@ -26,5 +27,15 @@ public class User implements Serializable{
 
     public boolean checkPassword(String password){
         return this.password.equals(password);
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public static void serialize(User u, DataOutputStream out) throws IOException {
+        out.writeUTF(u.getName());
+        out.writeUTF(u.getPassword());
+        out.writeInt(u.getId());
     }
 }

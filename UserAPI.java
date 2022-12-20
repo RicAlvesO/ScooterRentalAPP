@@ -31,7 +31,7 @@ public class UserAPI {
         
         // Create a frame with frameType 0 and send it trough the demultiplexer
         User user = new User(username, password);
-        Frame request = new Frame(0, user);
+        Frame request = new Frame(0, false,user);
         if (1==demultiplexer.send(request)){
             return -1;
         }
@@ -51,7 +51,7 @@ public class UserAPI {
         
         // Create a frame with frameType 1 and send it trough the demultiplexer
         User user = new User(username, password);
-        Frame request = new Frame(1, user);
+        Frame request = new Frame(1, false, user);
         if (1==demultiplexer.send(request)){
             return false;
         }
@@ -61,7 +61,7 @@ public class UserAPI {
             Frame response = demultiplexer.receive(1);
 
             // Parse the response value
-            return (1== (Integer)response.getData());
+            return (Boolean)response.getData();
         } catch (Exception e) {
             return false;
         }
@@ -70,7 +70,7 @@ public class UserAPI {
     public List<Pos> get_available(Pos current){
         
         // Create a frame with frameType 2 and send it trough the demultiplexer
-        Frame request = new Frame(2, current);
+        Frame request = new Frame(2, false, current);
         if (1==demultiplexer.send(request)){
             return null;
         }
@@ -93,7 +93,7 @@ public class UserAPI {
 
     public List<Reward> check_rewards(Pos current){
         // Create a frame with frameType 3 and send it trough the demultiplexer
-        Frame request = new Frame(3, current);
+        Frame request = new Frame(3, false, current);
         if (1 == demultiplexer.send(request)) {
             return null;
         }
@@ -116,7 +116,7 @@ public class UserAPI {
     public Reserve reserve_scooter(Pos start){
         
         // Create a frame with frameType 4 and send it trough the demultiplexer
-        Frame request = new Frame(4, start);
+        Frame request = new Frame(4, false, start);
         if (1==demultiplexer.send(request)){
             return null;
         }
@@ -133,7 +133,7 @@ public class UserAPI {
     public Price park_scooter(Reserve res){
         
         // Create a frame with frameType 5 and send it trough the demultiplexer
-        Frame request = new Frame(5, res);
+        Frame request = new Frame(5, false, res);
         if (1 == demultiplexer.send(request)) {
             return null;
         }
@@ -150,7 +150,7 @@ public class UserAPI {
     public boolean set_notifications(Pos desired){
             
         // Create a frame with frameType 6 and send it trough the demultiplexer
-        Frame request = new Frame(6, desired);
+        Frame request = new Frame(6, false, desired);
         if (1==demultiplexer.send(request)){
             return false;
         }
@@ -167,7 +167,7 @@ public class UserAPI {
     public Reward receive_notifications(){
             
         // Create a frame with frameType 7 and send it trough the demultiplexer
-        Frame request = new Frame(7, null);
+        Frame request = new Frame(7, false, null);
         if (1 == demultiplexer.send(request)) {
             return null;
         }
@@ -182,7 +182,7 @@ public class UserAPI {
     }
 
     public void close() throws IOException{
-        demultiplexer.send(new Frame(-1, null));
+        demultiplexer.send(new Frame(-1, false, null));
         demultiplexer.close();
     }
 

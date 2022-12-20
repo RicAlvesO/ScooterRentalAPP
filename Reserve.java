@@ -1,6 +1,7 @@
-import java.io.Serializable;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
-public class Reserve implements Serializable{
+public class Reserve{
     
     private int code;
     private Pos start;
@@ -41,4 +42,20 @@ public class Reserve implements Serializable{
     public double getDistance(){
         return Math.abs(start.getX() - end.getX()) + Math.abs(start.getY() - end.getY());
     }
+
+    public static void serialize(Reserve r, DataOutputStream out) throws IOException {
+        out.writeInt(r.getCode());
+        Pos p1 = r.getStart();
+        out.writeInt(p1.getX());
+        out.writeInt(p1.getY());
+        Pos p2 = r.getEnd();
+        if (p2 == null){
+            out.writeInt(-1);
+            out.writeInt(-1);
+        } else {
+            out.writeInt(p2.getX());
+            out.writeInt(p2.getY());
+        }
+        out.writeUTF(r.getDatetime());
+    } 
 }

@@ -1,6 +1,7 @@
-import java.io.Serializable;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
-public class Price implements Serializable{
+public class Price{
     
     private double price;
     private double discount;
@@ -20,5 +21,10 @@ public class Price implements Serializable{
 
     public double getFinalPrice() {
         return price - (price * discount);
+    }
+
+    public static void serialize(Price p, DataOutputStream out) throws IOException {
+        out.writeDouble(p.getPrice());
+        out.writeDouble(p.getDiscount());
     }
 }
