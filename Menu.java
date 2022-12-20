@@ -1,79 +1,86 @@
-import java.net.Socket;
-import java.security.Principal;
-import java.security.cert.CRL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Menu 
 {
-    Scanner scanner = new Scanner(System.in);
+    private Scanner scanner;
+    private UserAPI api;
+    //define a map that stores Reserves by user id
+    private Map<Integer, Reserve> reserveList;
 
-    public String menuInicial() 
+    public Menu(UserAPI api) {
+        this.scanner = new Scanner(System.in);
+        this.api = api;
+        this.reserveList = new HashMap<>();
+    }
+
+    public boolean menuInicial() 
     {
         int res = -1;
         boolean ok = false;
         String username = "";
         String password = "";
-        int w = -1;
 
         while((res != 1 || res != 2) && (ok == false))
         {
             clearWindow();
             System.out.println("------- Menu de login/registro --------");
-            System.out.print("  Se você deseja se registar prima '1'\n  Se você deseja fazer login prima '2'\n  --> ");
+            System.out.print("  1) Registar Utilizador\n  2) Realizar Login \n 0) Sair\n\n  --> ");
             res = scanner.nextInt();
         
-        switch(res)
-        {
-            case 1:
-                clearWindow();
-                System.out.println("---------------- Menu de registro -----------------\n\n");
-                System.out.print("  Indique o username: ");
-                username = scanner.next();
-                System.out.print("  Indique o password: ");
-                password = scanner.next();
-                
-                int id = register(new User(username, password));
-
-                System.out.println(("  \n\n << Você foi registado e o seu ID é: " + id + " >>\n\n"));
-                System.out.println("---------------------------------------------------\n");
-                break;
-
-            case 2:
-                clearWindow();
-                System.out.println("---------------- Menu de login ----------------\n\n");
-                System.out.print("  Indique o username: ");
-                username = scanner.next();
-                System.out.print("  Indique o password: ");
-                password = scanner.next();
-
-                ok = login(username, password);
-
-                if(ok == false) System.out.println("  << Falha no login >>");
-                else {
+            switch(res)
+            {
+                case 1:
                     clearWindow();
-                    System.out.println("  << Login efetuado com sucesso! Bem vindo " + username + "! >>\n");
-                }  
-                break;       
-        }
+                    System.out.println("---------------- Menu de registro -----------------\n\n");
+                    System.out.print("  Indique o username: ");
+                    username = scanner.next();
+                    System.out.print("  Indique o password: ");
+                    password = scanner.next();
 
-        while(w != 0)
-        {
-            System.out.print("Prima a tecla '0' para continuar: ");
-            w = scanner.nextInt();
-        }
+                    int id = this.api.register(username, password);
+
+                    System.out.println(("  \n\n << Você foi registado e o seu ID é: " + id + " >>\n\n"));
+                    System.out.println("---------------------------------------------------\n");
+                    ok=true;
+                    break;
+
+                case 2:
+                    clearWindow();
+                    System.out.println("---------------- Menu de login ----------------\n\n");
+                    System.out.print("  Indique o username: ");
+                    username = scanner.next();
+                    System.out.print("  Indique o password: ");
+                    password = scanner.next();
+
+                    ok = this.api.login(username, password);
+
+                    if(ok == false) System.out.println("  << Falha no login >>");
+                    else {
+                        clearWindow();
+                        System.out.println("  << Login efetuado com sucesso! Bem vindo " + username + "! >>\n");
+                    }  
+                    break;       
+                case 0:
+                    return false;
+            }
+
+            //press enter to continue
+            System.out.println("  Prima enter para continuar...");
+            scanner.nextLine();
 
         }
-        return username;
+        return true;
     }
 
-    public void menu(String nome)
+    public void menu()
     {
         while(true)
         {
             clearWindow();
             StringBuilder sb = new StringBuilder("--------------------------------- MENU ---------------------------------\n\n");
-            sb.append("  << Bem vindo " + nome + "! >>\n\n");
             sb.append("  1) As posições válidas desde a sua posição inicial\n");
             sb.append("  2) Verificar as recompensas disponíveis desde a sua posição inicial.\n");
             sb.append("  3) Reservar uma trotinette elétrica.\n");
@@ -107,7 +114,7 @@ public class Menu
                     System.out.println("\n");
 
                     Pos p = new Pos(x, y);
-                    List <Pos> Lpos = get_available(p);
+                    List <Pos> Lpos = this.api.get_available(p);
 
                     for(Pos pos : Lpos) {
                         System.out.println("-> " + pos.toString());
@@ -132,7 +139,7 @@ public class Menu
                     System.out.println("\n");
 
                     Pos posR = new Pos(x, y);
-                    List <Reward> Lreward = check_reward(posR);
+                    List <Reward> Lreward = this.api.check_rewards(posR);
 
                     for(Reward reward : Lreward) {
                         System.out.println("-> " + reward.toString());
@@ -158,8 +165,8 @@ public class Menu
 
                     Pos posS = new Pos(x, y);
 
-                    Reserve reserve = reserve_scooter(posS);
-                    reserveList.put(reserve.getCode(), reserve);
+                    Reserve reserve = this.api.reserve_scooter(posS);
+                    this.reserveList.put(reserve.getCode(), reserve);
                     System.out.println(reserve.toString());
                     System.out.println("------------------------------------------\n");
 
@@ -186,7 +193,7 @@ public class Menu
                     Reserve resv = reserveList.get(code);
                     resv.setEnd(end);
 
-                    Price price = park_scooter(resv);
+                    Price price = this.api.park_scooter(resv);
 
                     System.out.println("O preço é: " + price.toString());
                     System.out.println("---------------------------------------------\n");
@@ -208,7 +215,7 @@ public class Menu
                     y = scanner.nextInt();
 
                     Pos desired = new Pos(x, y);
-                    boolean onoff = set_notification(desired);
+                    boolean onoff = this.api.set_notifications(desired);
 
                     if(onoff == true) System.out.println("\n  As notificações da posiçåo (" + x + "," + y + ") estão ativadas!\n");
                     else System.out.println("\n  As notificações da posiçåo (" + x + "," + y + ") estão desativadas!\n");
@@ -224,7 +231,7 @@ public class Menu
                 case 6:
                     clearWindow();
                     System.out.println("--------------------------------------------\n");
-                    Reward reward = receive_notifications();
+                    Reward reward = this.api.receive_notifications();
                     System.out.println("-> " + reward.toString());
                     System.out.println("--------------------------------------------\n");
 

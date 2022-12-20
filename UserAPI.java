@@ -10,7 +10,7 @@ import java.util.List;
  * 3 -> check_rewards(Pos current) -> List<Reward>
  * 4 -> reserve_scooter(Pos start) -> Reserve
  * 5 -> park_scooter(Reserve) -> Price
- * 6 -> set_notification(Pos desired) -> Boolean
+ * 6 -> set_notifications(Pos desired) -> Boolean
  * 7 -> receive_notifications() -> Reward
  */
 
@@ -24,9 +24,10 @@ public class UserAPI {
         this.demultiplexer=new Demultiplexer(this.con);
     }
 
-    public int register(User user) {
-
+    public int register(String username, String password) {
+        
         // Create a frame with frameType 0 and send it trough the demultiplexer
+        User user = new User(username, password);
         Frame request = new Frame(0, user);
         if (1==demultiplexer.send(request)){
             return -1;
@@ -37,15 +38,16 @@ public class UserAPI {
             Frame response = demultiplexer.receive(0);
 
             // Parse the response value
-            return (Integer)response.getData();
+            return ((User)response.getData()).getId();
         } catch (Exception e) {
             return -1;
         }
     }
 
-    public Boolean login(User user) {
+    public Boolean login(String username, String password) {
         
         // Create a frame with frameType 1 and send it trough the demultiplexer
+        User user = new User(username, password);
         Frame request = new Frame(1, user);
         if (1==demultiplexer.send(request)){
             return false;
