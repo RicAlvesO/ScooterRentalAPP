@@ -1,4 +1,5 @@
 import java.net.ServerSocket;
+import java.net.Socket;
 
 public class Server {
     
@@ -18,7 +19,11 @@ public class Server {
     public void acceptConnections() {
         while (running) {
             try {
-                new Thread(new ClientHandler(serverSocket.accept())).start();
+                Socket clientSocket = serverSocket.accept();
+                Connection con = new Connection(clientSocket);
+                System.out.println("Connection from client accepted");
+
+                new Thread(new ClientHandler(con)).start();
             } catch (Exception e) {
                 e.printStackTrace();
                 running = false;

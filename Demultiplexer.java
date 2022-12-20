@@ -3,7 +3,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Demultiplexer {
+public class Demultiplexer implements Runnable{
 
     private final Connection con;
     private final ReentrantLock lock = new ReentrantLock();
@@ -14,21 +14,21 @@ public class Demultiplexer {
         this.con = con;
     }
 
-    public void start() {
-        new Thread(() -> {
-            while (true) {
-                try {
-                    Frame frame = con.receive();
-                    Alarm a = this.alarms.get(frame.getFrameType());
-                    a.push(frame);
-                } catch (Exception e) {
-                    System.out.println("Connection closed due to error!");
-                    running=false;
-                    con.close();
-                    e.printStackTrace();
-                }
+    @Override
+    public void run() {
+        System.out.println("Demultiplexer started");
+        boolean running = true;
+        while (running) {
+            try {
+                Frame frame = con.receive();
+                Alarm a = this.alarms.get(frame.getFrameType());
+                a.push(frame);
+            } catch (Exception e) {
+                System.out.println("Connection closed due to error!");
+                running=false;
+                con.close();
             }
-        });
+        }
     }
 
     public int send(Frame f){

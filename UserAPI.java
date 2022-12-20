@@ -23,6 +23,7 @@ public class UserAPI {
     public UserAPI(Socket s) throws IOException{
         this.con = new Connection(s);
         this.demultiplexer=new Demultiplexer(this.con);
+        new Thread(this.demultiplexer).start();
         System.out.println("Connection established");
     }
 
@@ -38,7 +39,7 @@ public class UserAPI {
         try {
             // Receive a frame from the demultiplexer
             Frame response = demultiplexer.receive(0);
-
+            System.out.println(response.getFrameType());
             // Parse the response value
             return ((User)response.getData()).getId();
         } catch (Exception e) {

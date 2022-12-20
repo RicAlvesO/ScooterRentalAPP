@@ -1,44 +1,43 @@
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Connection {
+public class Connection implements AutoCloseable {
 
     private Socket socket;
-    private ObjectInputStream in;
-    private ObjectOutputStream out;
+    private DataInputStream in;
+    private DataOutputStream out;
     private ReentrantLock wlock;
     private ReentrantLock rlock;
 
     public Connection(Socket socket) throws IOException{
         this.socket = socket;
-        this.in = new ObjectInputStream(socket.getInputStream());
-        this.out = new ObjectOutputStream(socket.getOutputStream());
+        this.in = new DataInputStream(socket.getInputStream());
+        this.out = new DataOutputStream(socket.getOutputStream());
         this.wlock = new ReentrantLock();
         this.rlock = new ReentrantLock();
     }
 
     public void send(Frame f) throws IOException{
         wlock.lock();
-        out.writeObject(f);
+        out.writeInt(f.getFrameType());
         wlock.unlock();
     }
 
     public Frame receive() throws IOException, ClassNotFoundException{
         rlock.lock();
-        Frame fr=(Frame)in.readObject();
+        Frame fr=new Frame(in.readInt(), null);
         rlock.unlock();
         return fr;
     }
 
-    public boolean close(){
+    public void close(){
         try {
             this.socket.close();
-            return true;
         } catch (IOException e) {
-            return false;
+            e.printStackTrace();
         }
     }
 }
