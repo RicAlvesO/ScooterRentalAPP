@@ -33,6 +33,10 @@ public class Menu
                 res = scanner.nextInt();
             }
 
+            if(!api.isRunning()){
+                return false;
+            }
+
             switch(res)
             {
                 case 1:
@@ -81,6 +85,7 @@ public class Menu
             //press enter to continue
             System.out.println("  Prima enter para continuar...");
             scanner.nextLine();
+            scanner.nextLine();
 
         }
         return true;
@@ -107,16 +112,20 @@ public class Menu
             {
                 res = scanner.nextInt();
             }
+            
+
+            if (!api.isRunning()) {
+                return;
+            }
 
             int x;
             int y;
-            int w = -1;
 
+            clearWindow();
+            System.out.println("--------------------------------------------\n");
             switch(res)
             {
                 case 1:
-                    clearWindow();
-                    System.out.println("---------------------------------------------\n");
                     System.out.println("  Indique as coordenadas da posição deseja:");
                     System.out.print("    x --> ");
                     x = scanner.nextInt();
@@ -125,23 +134,18 @@ public class Menu
                     System.out.println("\n");
 
                     Pos p = new Pos(x, y);
-                    List <Pos> Lpos = this.api.get_available(p);
+                    try{
+                        List<Pos> Lpos = this.api.get_available(p);
 
-                    for(Pos pos : Lpos) {
-                        System.out.println("-> " + pos.toString());
-                    }
-                    System.out.println("---------------------------------------------\n");
-
-                    while(w != 0)
-                    {
-                        System.out.print("Prima a tecla '0' para continuar: ");
-                        w = scanner.nextInt();
+                        for (Pos pos : Lpos) {
+                            System.out.println("-> " + pos.toString());
+                        }
+                    }catch(NullPointerException e){
+                        System.out.println("  << Couldn't acess Server >>");
                     }
                     
                     break;
                 case 2:
-                    clearWindow();
-                    System.out.println("------------------------------------------\n");
                     System.out.println("  Indique as coordenadas da posição deseja:");
                     System.out.print("    x --> ");
                     x = scanner.nextInt();
@@ -150,23 +154,18 @@ public class Menu
                     System.out.println("\n");
 
                     Pos posR = new Pos(x, y);
-                    List <Reward> Lreward = this.api.check_rewards(posR);
+                    try{
+                        List <Reward> Lreward = this.api.check_rewards(posR);
 
-                    for(Reward reward : Lreward) {
-                        System.out.println("-> " + reward.toString());
-                    }
-                    System.out.println("------------------------------------------\n");
-
-                    while(w != 0)
-                    {
-                        System.out.print("Prima a tecla '0' para continuar: ");
-                        w = scanner.nextInt();
+                        for(Reward reward : Lreward) {
+                            System.out.println("-> " + reward.toString());
+                        }
+                    }catch(NullPointerException e){
+                        System.out.println("  << Couldn't acess Server >>");
                     }
 
                     break;
                 case 3:
-                    clearWindow();
-                    System.out.println("------------------------------------------\n");
                     System.out.println("  Indique as coordenadas da posição inicial:");
                     System.out.print("    x --> ");
                     x = scanner.nextInt();
@@ -175,22 +174,16 @@ public class Menu
                     System.out.println("\n");
 
                     Pos posS = new Pos(x, y);
-
-                    Reserve reserve = this.api.reserve_scooter(posS);
-                    this.reserveList.put(reserve.getCode(), reserve);
-                    System.out.println(reserve.toString());
-                    System.out.println("------------------------------------------\n");
-
-                    while(w != 0)
-                    {
-                        System.out.print("Prima a tecla '0' para continuar: ");
-                        w = scanner.nextInt();
+                    try{
+                        Reserve reserve = this.api.reserve_scooter(posS);
+                        this.reserveList.put(reserve.getCode(), reserve);
+                        System.out.println(reserve.toString());
+                    }catch(NullPointerException e){
+                        System.out.println("  << Couldn't acess Server >>");
                     }
 
                     break;
                 case 4:
-                    clearWindow();
-                    System.out.println("---------------------------------------------\n");
                     System.out.println("  Indique as coordenadas da sua posição final:");
                     System.out.print("    x --> ");
                     x = scanner.nextInt();
@@ -203,56 +196,39 @@ public class Menu
                     int code = scanner.nextInt();
                     Reserve resv = reserveList.get(code);
                     resv.setEnd(end);
+                    try{
+                        Price price = this.api.park_scooter(resv);
 
-                    Price price = this.api.park_scooter(resv);
-
-                    System.out.println("O preço é: " + price.toString());
-                    System.out.println("---------------------------------------------\n");
-
-                    while(w != 0)
-                    {
-                        System.out.print("Prima a tecla '0' para continuar: ");
-                        w = scanner.nextInt();
+                        System.out.println("O preço é: " + price.toString());
+                    }catch(NullPointerException e){
+                        System.out.println("  << Couldn't acess Server >>");
                     }
-
-                    break;
                 case 5:
-                    clearWindow();
-                    System.out.println("--------------------------------------------------------\n");
                     System.out.println("  Indique as coordenadas da posição desejada:");
                     System.out.print("    x --> ");
                     x = scanner.nextInt();
                     System.out.print("    y --> ");
                     y = scanner.nextInt();
+                    
+                    try{
+                        Pos desired = new Pos(x, y);
+                        boolean onoff = this.api.set_notifications(desired);
 
-                    Pos desired = new Pos(x, y);
-                    boolean onoff = this.api.set_notifications(desired);
-
-                    if(onoff == true) System.out.println("\n  As notificações da posiçåo (" + x + "," + y + ") estão ativadas!\n");
-                    else System.out.println("\n  As notificações da posiçåo (" + x + "," + y + ") estão desativadas!\n");
-                    System.out.println("--------------------------------------------------------\n");
-
-                    while(w != 0)
-                    {
-                        System.out.print("Prima a tecla '0' para continuar: ");
-                        w = scanner.nextInt();
+                        if(onoff == true) System.out.println("\n  As notificações da posiçåo (" + x + "," + y + ") estão ativadas!\n");
+                        else System.out.println("\n  As notificações da posiçåo (" + x + "," + y + ") estão desativadas!\n");
+                    }catch(NullPointerException e){
+                        System.out.println("  << Couldn't acess Server >>");
+                    }
+                    break;
+                case 6:
+                    try{
+                        Reward reward = this.api.receive_notifications();
+                        System.out.println("-> " + reward.toString());
+                    } catch (NullPointerException e) {
+                        System.out.println("  << Couldn't acess Server >>");
                     }
 
                     break;
-                case 6:
-                    clearWindow();
-                    System.out.println("--------------------------------------------\n");
-                    Reward reward = this.api.receive_notifications();
-                    System.out.println("-> " + reward.toString());
-                    System.out.println("--------------------------------------------\n");
-
-                   while(w != 0)
-                   {
-                       System.out.print("Prima a tecla '0' para continuar: ");
-                       w = scanner.nextInt();
-                   }
-
-                   break;
                 case 0:
                     scanner.close();
                     try {
@@ -263,6 +239,9 @@ public class Menu
                     System.exit(0);
                     break;
             }
+            System.out.println("---------------------------------------------\n");
+            scanner.nextLine();
+            scanner.nextLine();
             
         }
     }

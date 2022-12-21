@@ -3,6 +3,7 @@ import java.net.Socket;
 
 public class Server {
     
+    private UserDB userDB;
     private ServerSocket serverSocket;
     private boolean running;
 
@@ -10,6 +11,7 @@ public class Server {
         try {
             this.serverSocket = new ServerSocket(12345);
             this.running = true;
+            this.userDB = new UserDB();
         } catch (Exception e) {
             System.err.println("Could not listen on port: 12345.");
             System.exit(1);
@@ -23,7 +25,7 @@ public class Server {
                 Connection con = new Connection(clientSocket);
                 System.out.println("Connection from client accepted");
 
-                new Thread(new ClientHandler(con)).start();
+                new Thread(new ClientHandler(con,userDB)).start();
             } catch (Exception e) {
                 e.printStackTrace();
                 running = false;

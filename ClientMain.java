@@ -8,7 +8,7 @@ public class ClientMain {
             api = new UserAPI(socket);
             System.out.println("Conectado com o servidor");
         }catch(Exception e){
-            System.out.println("Erro ao conectar com o servidor");
+            System.err.println("Erro ao conectar com o servidor");
             return;
         }
         Menu menu = new Menu(api);
