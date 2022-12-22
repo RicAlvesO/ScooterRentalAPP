@@ -176,8 +176,11 @@ public class Menu
                     Pos posS = new Pos(x, y);
                     try{
                         Reserve reserve = this.api.reserve_scooter(posS);
-                        this.reserveList.put(reserve.getCode(), reserve);
-                        System.out.println(reserve.toString());
+                        if (reserve.getCode()==-1) System.out.println("  << Não existem trotinetes disponíveis >>");
+                        else{
+                            this.reserveList.put(reserve.getCode(), reserve);
+                            System.out.println(reserve.toString());
+                        }
                     }catch(NullPointerException e){
                         System.out.println("  << Couldn't acess Server >>");
                     }
@@ -203,6 +206,7 @@ public class Menu
                     }catch(NullPointerException e){
                         System.out.println("  << Couldn't acess Server >>");
                     }
+                    break;
                 case 5:
                     System.out.println("  Indique as coordenadas da posição desejada:");
                     System.out.print("    x --> ");

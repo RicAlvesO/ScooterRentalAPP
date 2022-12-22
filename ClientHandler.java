@@ -3,12 +3,14 @@ public class ClientHandler implements Runnable{
     private Connection con;
     private boolean running;
     private UserDB userDB;
+    private Grid grid;
     private String current;
 
-    public ClientHandler(Connection con, UserDB userDB) {
+    public ClientHandler(Connection con, UserDB userDB, Grid grid) {
         try {
             this.con = con;
             this.userDB = userDB;
+            this.grid = grid;
             this.running = true;
             this.current = null;
         } catch (Exception e) {
@@ -68,6 +70,29 @@ public class ClientHandler implements Runnable{
                         this.current=u.getName();
                     }
                     this.con.send(new Frame(1,true,login));
+                    break;
+                case 2:
+                    Pos p=(Pos)f.getData();
+                    System.out.println("User " + this.current + " checked availability at " + p.getX() + " " + p.getY());
+                    this.con.send(new Frame(2,true,grid.checkAvailability(p)));
+                    break;
+                case 4:
+                    Pos p1=(Pos)f.getData();
+                    System.out.println("User " + this.current + " wants to book at " + p1.getX() + " " + p1.getY());
+                    Reserve r = grid.rentScotter(p1);
+                    this.con.send(new Frame(4,true,r));
+                    if (r == null) {
+                        System.out.println("User " + this.current + " failed to book at " + p1.getX() + " " + p1.getY());
+                    }else{
+                        System.out.println("User " + this.current + " booked at " + p1.getX() + " " + p1.getY());
+                    }
+                    break;
+                case 5:
+                    Reserve r1=(Reserve)f.getData();
+                    System.out.println("User " + this.current + " wants to end reservation at " + r1.getEnd().getX() + " " + r1.getEnd().getY());
+                    Price price = grid.returnScooter(r1);
+                    this.con.send(new Frame(5,true,price));
+                    System.out.println("User " + this.current + " owes " + price.getPrice() + " with discount of " + price.getDiscount() + "% (Total "+ price.getFinalPrice() + ")");
                     break;
             }
 

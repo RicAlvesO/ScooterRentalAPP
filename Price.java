@@ -12,6 +12,11 @@ public class Price{
         this.discount = discount;
     }
 
+    public Price(int time, int distance) {
+        this.price = generatePrice(time, distance);
+        this.discount = 0;
+    }
+
     public double getPrice() {
         return price;
     }
@@ -22,6 +27,18 @@ public class Price{
 
     public double getFinalPrice() {
         return price - (price * discount);
+    }
+
+    public double generatePrice(double time, int distance) {
+        return (time * 0.5) + (distance);
+    }
+
+    public String toString() {
+        String s = "Price: \n";
+        s += "   Normal price: " + price + "\n";
+        s += "   Discount: " + discount + "\n";
+        s += "   Final price: " + getFinalPrice() + "\n";
+        return s;
     }
 
     public static void serialize(Price p, DataOutputStream out) throws IOException {

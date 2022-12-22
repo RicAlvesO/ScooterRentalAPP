@@ -30,4 +30,8 @@ public class Pos {
         int y = in.readInt();
         return new Pos(x, y);
     }
+
+    public String toString() {
+        return "Pos " + "(" + x + "," + y + ")";
+    }
 }
