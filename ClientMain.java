@@ -4,7 +4,7 @@ public class ClientMain {
     public static void main(String[] args) {
         UserAPI api;
         try{
-            Socket socket = new Socket("localhost", 12345);
+            Socket socket = new Socket("localhost", ConfigGlobal.port);
             api = new UserAPI(socket);
             System.out.println("Conectado com o servidor");
         }catch(Exception e){

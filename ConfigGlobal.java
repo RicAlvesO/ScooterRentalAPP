@@ -6,6 +6,7 @@ public class ConfigGlobal {
     public static int size=20;
     public static int amount=100;
     public static int radius=3;
+    public static int port=7777;
 
     public static String getDateTime() {
         LocalDateTime now = LocalDateTime.now();

@@ -114,7 +114,7 @@ public class Frame{
             case 2:
                 if (response) {
                     int size = in.readInt();
-                    List<Pos> l = new ArrayList<Pos>(size);
+                    List<Pos> l = new ArrayList<Pos>();
                     for (int i = 0; i < size; i++) {
                         l.add(Pos.deserialize(in));
                     }
@@ -126,7 +126,7 @@ public class Frame{
             case 3:
                 if (response) {
                     int size = in.readInt();
-                    List<Reward> l = new ArrayList<Reward>(size);
+                    List<Reward> l = new ArrayList<Reward>();
                     for (int i = 0; i < size; i++) {
                         l.add(Reward.deserialize(in));
                     }

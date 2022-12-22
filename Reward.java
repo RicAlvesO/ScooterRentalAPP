@@ -30,6 +30,14 @@ public class Reward{
         return this.start.equals(start) && this.end.equals(end);
     }
 
+    public String toString() {
+        String s = "Reward: ";
+        s += "   start: " + start + "\n";
+        s += "   end: " + end + "\n";
+        s += "   discount: " + discount + "\n";
+        return s;
+    }
+
     public static void serialize(Reward r, DataOutputStream out) throws IOException {
         Pos p1 = r.getStart();
         Pos p2 = r.getEnd();

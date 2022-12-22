@@ -20,6 +20,15 @@ public class Pos {
         return y;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Pos) {
+            Pos p = (Pos) o;
+            return this.x == p.x && this.y == p.y;
+        }
+        return false;
+    }
+
     public static void serialize(Pos p,DataOutputStream out) throws IOException {
         out.writeInt(p.getX());
         out.writeInt(p.getY());
@@ -33,5 +42,10 @@ public class Pos {
 
     public String toString() {
         return "Pos " + "(" + x + "," + y + ")";
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) x*1000 + y;
     }
 }

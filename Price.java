@@ -17,6 +17,11 @@ public class Price{
         this.discount = 0;
     }
 
+    public Price(int time, int distance, double discount) {
+        this.price = generatePrice(time, distance);
+        this.discount = discount;
+    }
+
     public double getPrice() {
         return price;
     }

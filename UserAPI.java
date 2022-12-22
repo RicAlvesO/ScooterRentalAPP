@@ -100,7 +100,7 @@ public class UserAPI {
 
         // Receive a frame from the demultiplexer
         try {
-            Frame response = demultiplexer.receive(2);
+            Frame response = demultiplexer.receive(3);
             // Return list of available positions
             List<?> avail = (List<?>) response.getData();
             List<Reward> list = new ArrayList<Reward>();

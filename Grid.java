@@ -7,22 +7,20 @@ public class Grid{
 
     private int[][] grid;
     private int id_code;
-    private int size;
     private ReadWriteLock lock;
 
-    public Grid(int size, int amount){
+    public Grid(int amount){
         this.id_code = 0;
-        this.size = size;
         this.lock = new ReentrantReadWriteLock();
-        grid = new int[size][size];
-        for (int i = 0; i < size; i++){
-            for (int j = 0; j < size; j++){
+        grid = new int[ConfigGlobal.size][ConfigGlobal.size];
+        for (int i = 0; i < ConfigGlobal.size; i++){
+            for (int j = 0; j < ConfigGlobal.size; j++){
                 grid[i][j] = 0; // 0 significa que não tem trotinetes
             }
         }
         while (amount>0){
-            int x = (int) (Math.random() * size);
-            int y = (int) (Math.random() * size);
+            int x = (int) (Math.random() * ConfigGlobal.size);
+            int y = (int) (Math.random() * ConfigGlobal.size);
             grid[x][y] += 1;
             amount--;
         }
@@ -52,11 +50,11 @@ public class Grid{
         int minx=start.getX()-ConfigGlobal.radius;
         if (minx < 0) minx = 0;
         int maxx=start.getX()+ConfigGlobal.radius;
-        if (maxx >= size) maxx = size-1;
+        if (maxx >= ConfigGlobal.size) maxx = ConfigGlobal.size-1;
         int miny=start.getY()-ConfigGlobal.radius;
         if (miny < 0) miny = 0;
         int maxy=start.getY()+ConfigGlobal.radius;
-        if (maxy >= size) maxy = size-1;
+        if (maxy >= ConfigGlobal.size) maxy = ConfigGlobal.size-1;
         List<Pos> posList = new ArrayList<Pos>();
         
         this.lock.readLock().lock();
@@ -77,11 +75,11 @@ public class Grid{
         int minx=start.getX() - ConfigGlobal.radius;
         if (minx < 0) minx = 0;
         int maxx=start.getX() + ConfigGlobal.radius;
-        if (maxx >= size) maxx = size-1;
+        if (maxx >= ConfigGlobal.size) maxx = ConfigGlobal.size-1;
         int miny=start.getY() - ConfigGlobal.radius;
         if (miny < 0) miny = 0;
         int maxy=start.getY() + ConfigGlobal.radius;
-        if (maxy >= size) maxy = size-1;
+        if (maxy >= ConfigGlobal.size) maxy = ConfigGlobal.size-1;
         Reserve reserve = null;
         List<Pos> posList = new ArrayList<Pos>();
         this.lock.writeLock().lock();
@@ -116,25 +114,30 @@ public class Grid{
         return reserve;
     }
     
-    public Price returnScooter(Reserve reserve){
+    public Price returnScooter(Reserve reserve, double discount){
         this.lock.writeLock().lock();
         grid[reserve.getEnd().getY()][reserve.getEnd().getX()] += 1;
         this.lock.writeLock().unlock();
         int distance = reserve.getDistance();
         int time = ConfigGlobal.calculateDifference(reserve.getTimeStart(), reserve.getTimeEnd());
-        Price price = new Price(time, distance);
-        //parte do desconto
+        Price price = new Price(time, distance, discount); 
         return price;
     }
-    
-    public int getSize(){
-        return this.size;
+
+    public int[][] getGrid(){
+        int[][] copy = new int[ConfigGlobal.size][ConfigGlobal.size];
+        for (int i = 0; i < ConfigGlobal.size; i++){
+            for (int j = 0; j < ConfigGlobal.size; j++){
+                copy[i][j] = grid[i][j];
+            }
+        }
+        return copy;
     }
     
     public String toString(){
         String s = "";
-        for (int i = 0; i < size; i++){
-            for (int j = 0; j < size; j++){
+        for (int i = 0; i < ConfigGlobal.size; i++){
+            for (int j = 0; j < ConfigGlobal.size; j++){
                 s += String.format("[%3d]", grid[i][j]);
                 s += " ";
             }

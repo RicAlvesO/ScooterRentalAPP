@@ -32,7 +32,7 @@ public class Alarm {
     public void clear(){
         this.lock.lock();
         if (this.queue.isEmpty() == false) {
-            this.alarm.signal();
+            this.alarm.signalAll();
         }
         this.lock.unlock();
     }

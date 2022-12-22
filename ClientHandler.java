@@ -1,16 +1,20 @@
+import java.util.List;
+
 public class ClientHandler implements Runnable{
     //receive the socket from server and start the thread
     private Connection con;
     private boolean running;
     private UserDB userDB;
     private Grid grid;
+    private RewardHandler rewardHandler;
     private String current;
 
-    public ClientHandler(Connection con, UserDB userDB, Grid grid) {
+    public ClientHandler(Connection con, UserDB userDB, Grid grid, RewardHandler rewardHandler) {
         try {
             this.con = con;
             this.userDB = userDB;
             this.grid = grid;
+            this.rewardHandler = rewardHandler;
             this.running = true;
             this.current = null;
         } catch (Exception e) {
@@ -76,10 +80,20 @@ public class ClientHandler implements Runnable{
                     System.out.println("User " + this.current + " checked availability at " + p.getX() + " " + p.getY());
                     this.con.send(new Frame(2,true,grid.checkAvailability(p)));
                     break;
+                case 3:
+                    Pos st=(Pos)f.getData();
+                    System.out.println("User " + this.current + " wants to check rewards at " + st.getX() + " " + st.getY());
+                    List<Reward> rewards = this.rewardHandler.getRewards(st);
+                    for(Reward r: rewards){
+                        System.out.println("User " + this.current + " found reward at " + r.getStart() + " " + r.getEnd());
+                    }
+                    this.con.send(new Frame(3,true,rewards));
+                    break;
                 case 4:
                     Pos p1=(Pos)f.getData();
                     System.out.println("User " + this.current + " wants to book at " + p1.getX() + " " + p1.getY());
                     Reserve r = grid.rentScotter(p1);
+                    this.rewardHandler.updateMap();
                     this.con.send(new Frame(4,true,r));
                     if (r == null) {
                         System.out.println("User " + this.current + " failed to book at " + p1.getX() + " " + p1.getY());
@@ -89,8 +103,9 @@ public class ClientHandler implements Runnable{
                     break;
                 case 5:
                     Reserve r1=(Reserve)f.getData();
+                    Double discount = this.rewardHandler.confirmReward(r1.getStart(), r1.getEnd());
                     System.out.println("User " + this.current + " wants to end reservation at " + r1.getEnd().getX() + " " + r1.getEnd().getY());
-                    Price price = grid.returnScooter(r1);
+                    Price price = grid.returnScooter(r1,discount);
                     this.con.send(new Frame(5,true,price));
                     System.out.println("User " + this.current + " owes " + price.getPrice() + " with discount of " + price.getDiscount() + "% (Total "+ price.getFinalPrice() + ")");
                     break;
