@@ -1,6 +1,8 @@
 import java.io.DataOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Pos {
     
@@ -42,6 +44,28 @@ public class Pos {
 
     public String toString() {
         return "Pos " + "(" + x + "," + y + ")";
+    }
+
+    public static List<Pos> getRange(Pos start) {
+
+        int minx = start.getX() - ConfigGlobal.radius;
+        if (minx < 0) minx = 0;
+        int maxx = start.getX() + ConfigGlobal.radius;
+        if (maxx >= ConfigGlobal.size) maxx = ConfigGlobal.size - 1;
+        int miny = start.getY() - ConfigGlobal.radius;
+        if (miny < 0) miny = 0;
+        int maxy = start.getY() + ConfigGlobal.radius;
+        if (maxy >= ConfigGlobal.size) maxy = ConfigGlobal.size - 1;
+        List<Pos> posList = new ArrayList<Pos>();
+
+        for (int i = miny; i <= maxy; i++) {
+            for (int j = minx; j <= maxx; j++) {
+                if (Math.abs(i - start.getY()) + Math.abs(j - start.getX()) <= ConfigGlobal.radius) {
+                    posList.add(new Pos(j, i));
+                }
+            }
+        }
+        return posList;
     }
 
     @Override

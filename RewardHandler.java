@@ -11,6 +11,7 @@ public class RewardHandler implements Runnable {
     private Map <Pos,List<Reward>> rewards;
     private ReadWriteLock lock;
     private Condition update;
+    private Condition hasUpdate;
     private boolean isUpdated;
     private Grid grid;
 
@@ -18,6 +19,7 @@ public class RewardHandler implements Runnable {
         this.rewards = new HashMap <Pos,List<Reward>>();
         this.lock = new ReentrantReadWriteLock();
         this.update = lock.writeLock().newCondition();
+        this.hasUpdate = lock.writeLock().newCondition();
         this.grid = grid;
         this.generateRewards();
         this.isUpdated = true;
@@ -35,6 +37,7 @@ public class RewardHandler implements Runnable {
             }
             this.generateRewards();
             this.isUpdated = true;
+            this.hasUpdate.signalAll();
             System.out.println("Rewards updated");
             lock.writeLock().unlock();
         }
@@ -54,7 +57,7 @@ public class RewardHandler implements Runnable {
         return up;
     }
 
-    public List<Reward> getRewards(Pos start) {
+    public List<Reward> getRewards(Pos start){
 
         int minx=start.getX()-ConfigGlobal.radius;
         if (minx < 0) minx = 0;
@@ -67,14 +70,20 @@ public class RewardHandler implements Runnable {
         
         List<Reward> ret = new ArrayList<Reward>();
 
-        lock.readLock().lock();
         
-        while(!this.isUpdated()) {
+        if (!this.isUpdated()) {
             System.out.println("Waiting for update");
+            try {
+                this.lock.writeLock().lock();
+                this.hasUpdate.await();
+                this.lock.writeLock().unlock();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
+        lock.readLock().lock();
         for (int i = miny; i <= maxy; i++){
             for (int j = minx; j <= maxx; j++){
-                System.out.println("Checking: " + j + " " + i);
                 if (rewards.containsKey(new Pos(j, i)) && (Math.abs(i-start.getY()) + Math.abs(j-start.getX())) <= ConfigGlobal.radius){
                     ret.addAll(rewards.get(new Pos(j, i)));
                 }
@@ -85,12 +94,19 @@ public class RewardHandler implements Runnable {
     }
 
     public double confirmReward(Pos start, Pos end) {
-        this.lock.readLock().lock();
-        while (!this.isUpdated()) {
+        if (!this.isUpdated()) {
             System.out.println("Waiting for update");
+            try {
+                this.lock.writeLock().lock();
+                this.hasUpdate.await();
+                this.lock.writeLock().unlock();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         
+        this.lock.readLock().lock();
         if (rewards.containsKey(start)) {
             for (Reward r : rewards.get(start)) {
                 if (r.confirmReward(start, end)) {
@@ -139,4 +155,24 @@ public class RewardHandler implements Runnable {
         return (dist*1.0/(ConfigGlobal.size*2.0));
     }
 
+    public List<Reward> getListRewards(NotificationHandler nh){
+        this.lock.writeLock().lock();
+        try {
+            this.hasUpdate.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        this.lock.writeLock().unlock();
+        this.lock.readLock().lock();
+        List<Reward> ret = new ArrayList<Reward>();
+        System.out.println("Sending updated rewards");
+        List<Pos> toCheck = nh.getDesiredPos();
+        for (Pos p : toCheck) {
+            if (rewards.containsKey(p)) {
+                ret.addAll(rewards.get(p));
+            }
+        }
+        this.lock.readLock().unlock();
+        return ret;
+    }
 }

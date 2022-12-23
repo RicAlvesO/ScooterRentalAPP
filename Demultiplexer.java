@@ -53,6 +53,9 @@ public class Demultiplexer implements Runnable{
 
     public Frame receive(int tag) throws InterruptedException {
         this.lock.lock();
+        if (this.alarms.containsKey(tag)==false) {
+            this.alarms.put(tag, new Alarm());
+        }
         Alarm al = this.alarms.get(tag);
         this.lock.unlock();
         Frame f = al.poll();

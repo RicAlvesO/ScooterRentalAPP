@@ -157,28 +157,28 @@ public class UserAPI {
 
         // Receive a frame from the demultiplexer
         try {
-            Frame response = demultiplexer.receive(2);
-            return (1==(Integer)response.getData());
+            Frame response = demultiplexer.receive(6);
+            return (Boolean)response.getData();
         } catch (Exception e) {
             return false;
         }
     }
 
-    public Reward receive_notifications(){
+    public List<Reward> receive_notifications(){
             
-        // Create a frame with frameType 7 and send it trough the demultiplexer
-        Frame request = new Frame(7, false, null);
-        if (1 == demultiplexer.send(request)) {
-            return null;
-        }
-
-        // Receive a frame from the demultiplexer
         try {
-            Frame response = demultiplexer.receive(7);
-            return (Reward)response.getData();
-        } catch (Exception e) {
-            return null;
+            Frame response= demultiplexer.receive(7);
+            // Return list of available positions
+            List<?> avail = (List<?>) response.getData();
+            List<Reward> list = new ArrayList<Reward>();
+            for (Object o : avail) {
+                list.add((Reward) o);
+            }
+            return list;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+        return null;
     }
 
     public void close() throws IOException{

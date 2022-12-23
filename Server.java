@@ -30,8 +30,11 @@ public class Server {
                 Socket clientSocket = serverSocket.accept();
                 Connection con = new Connection(clientSocket);
                 System.out.println("Connection from client accepted");
-
-                new Thread(new ClientHandler(con,userDB,grid,rewardHandler)).start();
+                ClientHandler client= new ClientHandler(con, userDB, grid, rewardHandler);
+                NotificationHandler notificationHandler = new NotificationHandler(con, rewardHandler,client);
+                client.setNotificationHandler(notificationHandler);
+                new Thread(client).start();
+                new Thread(notificationHandler).start();
             } catch (Exception e) {
                 e.printStackTrace();
                 running = false;

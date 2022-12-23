@@ -102,7 +102,6 @@ public class Menu
             sb.append("  3) Reservar uma trotinette elétrica.\n");
             sb.append("  4) Terminar a reserva da trotinette elétrica.\n");
             sb.append("  5) Ativar ou desativar as notificações.\n");
-            sb.append("  6) Notificações recebidas.\n");
             sb.append("  0) Sair.\n\n");
             sb.append("  Selecione a opção pretendida: ");
             System.out.print(sb.toString());
@@ -223,15 +222,6 @@ public class Menu
                     }catch(NullPointerException e){
                         System.out.println("  << Couldn't acess Server >>");
                     }
-                    break;
-                case 6:
-                    try{
-                        Reward reward = this.api.receive_notifications();
-                        System.out.println("-> " + reward.toString());
-                    } catch (NullPointerException e) {
-                        System.out.println("  << Couldn't acess Server >>");
-                    }
-
                     break;
                 case 0:
                     scanner.close();

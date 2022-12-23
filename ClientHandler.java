@@ -1,4 +1,6 @@
 import java.util.List;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class ClientHandler implements Runnable{
     //receive the socket from server and start the thread
@@ -7,7 +9,9 @@ public class ClientHandler implements Runnable{
     private UserDB userDB;
     private Grid grid;
     private RewardHandler rewardHandler;
+    private NotificationHandler notificationHandler;
     private String current;
+    private ReadWriteLock lock;
 
     public ClientHandler(Connection con, UserDB userDB, Grid grid, RewardHandler rewardHandler) {
         try {
@@ -15,20 +19,28 @@ public class ClientHandler implements Runnable{
             this.userDB = userDB;
             this.grid = grid;
             this.rewardHandler = rewardHandler;
+            this.notificationHandler = null;
             this.running = true;
             this.current = null;
+            this.lock = new ReentrantReadWriteLock();
         } catch (Exception e) {
             System.out.println("Error in ClientHandler constructor: " + e.getMessage());
         }
     }
 
+    public void setNotificationHandler(NotificationHandler notificationHandler) {
+        this.notificationHandler = notificationHandler;
+    }
+
     @Override
     public void run() {
-        while(running){
+        while(this.isRunning()){
             try {
                 Frame msg = con.receive();
                 if (msg.getFrameType() == -1) {
+                    this.lock.writeLock().lock();
                     running = false;
+                    this.lock.writeLock().unlock();
                     if (this.current != null) {
                         this.userDB.logoff(this.current);
                         System.out.println("User " + this.current + " disconnected");
@@ -44,8 +56,11 @@ public class ClientHandler implements Runnable{
                     this.userDB.logoff(this.current);
                     System.out.println("User " + this.current + " disconnected");
                 }
+                this.lock.writeLock().lock();
+                this.running = false;
+                this.lock.writeLock().unlock();
                 System.out.println("Connection closed by client error");
-                return;
+                break;
             }
         }
         this.con.close();
@@ -106,8 +121,15 @@ public class ClientHandler implements Runnable{
                     Double discount = this.rewardHandler.confirmReward(r1.getStart(), r1.getEnd());
                     System.out.println("User " + this.current + " wants to end reservation at " + r1.getEnd().getX() + " " + r1.getEnd().getY());
                     Price price = grid.returnScooter(r1,discount);
+                    this.rewardHandler.updateMap();
                     this.con.send(new Frame(5,true,price));
                     System.out.println("User " + this.current + " owes " + price.getPrice() + " with discount of " + price.getDiscount() + "% (Total "+ price.getFinalPrice() + ")");
+                    break;
+                case 6:
+                    Pos p2=(Pos)f.getData();
+                    System.out.println("User " + this.current + " wants to toggle notifications at " + p2.getX() + " " + p2.getY());
+                    boolean stat=this.notificationHandler.toggleNotification(p2);
+                    this.con.send(new Frame(6,true,stat));
                     break;
             }
 
@@ -115,6 +137,13 @@ public class ClientHandler implements Runnable{
             System.out.println("Error in handleQuery: " + e.getMessage());
         }
         System.out.println("Sent: " + f.getFrameType());
+    }
+
+    public boolean isRunning(){
+        this.lock.readLock().lock();
+        boolean runs=this.running;
+        this.lock.readLock().unlock();
+        return runs;
     }
 }
 

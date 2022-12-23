@@ -86,7 +86,11 @@ public class Frame{
                 break;
             case 7:
                 if (response) {
-                    Reward.serialize((Reward) data, out);
+                    List<?> list = (List<?>) data;
+                    out.writeInt(list.size());
+                    for (Object o : list) {
+                        Reward.serialize((Reward) o, out);
+                    }
                 }
                 break;
         }
@@ -158,7 +162,12 @@ public class Frame{
                 break;
             case 7:
                 if (response) {
-                    data = Reward.deserialize(in);
+                    int size = in.readInt();
+                    List<Reward> l = new ArrayList<Reward>();
+                    for (int i = 0; i < size; i++) {
+                        l.add(Reward.deserialize(in));
+                    }
+                    data = l;
                 }
                 break;
         }
