@@ -31,10 +31,10 @@ public class Reward{
     }
 
     public String toString() {
-        String s = "Reward: ";
-        s += "   start: " + start + "\n";
-        s += "   end: " + end + "\n";
-        s += "   discount: " + discount + "\n";
+        String s = "Reward: (";
+        s += "Start: " + start ;
+        s += ",End: " + end ;
+        s += ",Discount: " + discount*100 + "%)";
         return s;
     }
 

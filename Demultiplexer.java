@@ -27,7 +27,7 @@ public class Demultiplexer implements Runnable{
                 a.push(frame);
             } catch (Exception e) {
                 if (running == false) return;
-                System.err.println("Connection closed due to error!");
+                System.err.println("Connection closed!");
                 this.close();
                 return;
             }

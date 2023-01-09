@@ -75,6 +75,7 @@ public class RewardHandler implements Runnable {
             System.out.println("Waiting for update");
             try {
                 this.lock.writeLock().lock();
+                this.update.signal();
                 this.hasUpdate.await();
                 this.lock.writeLock().unlock();
             } catch (InterruptedException e) {
@@ -98,6 +99,7 @@ public class RewardHandler implements Runnable {
             System.out.println("Waiting for update");
             try {
                 this.lock.writeLock().lock();
+                this.update.signal();
                 this.hasUpdate.await();
                 this.lock.writeLock().unlock();
             } catch (InterruptedException e) {

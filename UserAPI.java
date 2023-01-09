@@ -39,7 +39,6 @@ public class UserAPI {
         try {
             // Receive a frame from the demultiplexer
             Frame response = demultiplexer.receive(0);
-            System.out.println(response.getFrameType());
             // Parse the response value
             return (Integer)response.getData();
         } catch (Exception e) {

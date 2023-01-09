@@ -39,10 +39,10 @@ public class Price{
     }
 
     public String toString() {
-        String s = "Price: \n";
-        s += "   Normal price: " + price + "\n";
-        s += "   Discount: " + discount + "\n";
-        s += "   Final price: " + getFinalPrice() + "\n";
+        String s = "Price: (";
+        s += "Normal price: " + price;
+        s += ", Discount: " + discount;
+        s += ", Final price: " + getFinalPrice() + ")";
         return s;
     }
 
