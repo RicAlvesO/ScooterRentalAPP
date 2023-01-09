@@ -70,18 +70,7 @@ public class RewardHandler implements Runnable {
         
         List<Reward> ret = new ArrayList<Reward>();
 
-        
-        if (!this.isUpdated()) {
-            System.out.println("Waiting for update");
-            try {
-                this.lock.writeLock().lock();
-                this.update.signal();
-                this.hasUpdate.await();
-                this.lock.writeLock().unlock();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+    
         lock.readLock().lock();
         for (int i = miny; i <= maxy; i++){
             for (int j = minx; j <= maxx; j++){
@@ -95,18 +84,7 @@ public class RewardHandler implements Runnable {
     }
 
     public double confirmReward(Pos start, Pos end) {
-        if (!this.isUpdated()) {
-            System.out.println("Waiting for update");
-            try {
-                this.lock.writeLock().lock();
-                this.update.signal();
-                this.hasUpdate.await();
-                this.lock.writeLock().unlock();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
+        
         
         this.lock.readLock().lock();
         if (rewards.containsKey(start)) {

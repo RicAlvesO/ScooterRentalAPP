@@ -6,6 +6,7 @@ class TestWorker implements Runnable {
     int am;      // Amount of operations
     int mode;    // -1 for random operations
     boolean v;   // Verbose
+    int size=ConfigGlobal.size;
 
     // Constructor with Verbose option
     public TestWorker(UserAPI api, int am, int mode, boolean v) {
@@ -36,8 +37,8 @@ class TestWorker implements Runnable {
             switch (op) {
 
                 case 0:
-                    Pos toCheck = new Pos(rand.nextInt(20), rand.nextInt(20));
-                    System.out.println("[" + Thread.currentThread().getName().toUpperCase() + "] "+
+                    Pos toCheck = new Pos(rand.nextInt(size), rand.nextInt(size));
+                    if(v)System.out.println("[" + Thread.currentThread().getName().toUpperCase() + "] "+
                                        "Procurar trotinete perto de "+toCheck.toString()+"!");
                     List<Pos> l=api.get_available(toCheck);
                     if (v){
@@ -58,8 +59,8 @@ class TestWorker implements Runnable {
 
                 // Balance
                 case 1:
-                    Pos toCheck2 = new Pos(rand.nextInt(20), rand.nextInt(20));
-                    System.out.println("[" + Thread.currentThread().getName().toUpperCase() + "] "+
+                    Pos toCheck2 = new Pos(rand.nextInt(size), rand.nextInt(size));
+                    if(v)System.out.println("[" + Thread.currentThread().getName().toUpperCase() + "] "+
                                        "Procurar recompensa perto de "+toCheck2.toString()+"!");
                     List<Reward> l2=api.check_rewards(toCheck2);
                     if (v){
@@ -78,8 +79,8 @@ class TestWorker implements Runnable {
                     }
                     break;
                 case 2:
-                    Pos toCheck3 = new Pos(rand.nextInt(20), rand.nextInt(20));
-                    System.out.println("[" + Thread.currentThread().getName().toUpperCase() + "] "+
+                    Pos toCheck3 = new Pos(rand.nextInt(size), rand.nextInt(size));
+                    if(v)System.out.println("[" + Thread.currentThread().getName().toUpperCase() + "] "+
                                        "Tentar reservar perto de "+toCheck3.toString()+"!");
                     Reserve rev = api.reserve_scooter(toCheck3);
                     boolean rd = rev.getCode()==-1;
@@ -93,8 +94,8 @@ class TestWorker implements Runnable {
                         }
                     }
                     if(!rd){
-                        Pos toEnd = new Pos(rand.nextInt(20), rand.nextInt(20));
-                        System.out.println("[" + Thread.currentThread().getName().toUpperCase() + "] "+
+                        Pos toEnd = new Pos(rand.nextInt(size), rand.nextInt(size));
+                        if(v)System.out.println("[" + Thread.currentThread().getName().toUpperCase() + "] "+
                                            "Terminar reserva em "+toEnd.toString()+"!");
                         rev.setEnd(toEnd);
                         Price pr = api.park_scooter(rev);

@@ -3,8 +3,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class ConfigGlobal {
-    public static int size=20;
-    public static int amount=100;
+    public static int size=25;
+    public static int amount=500;
     public static int radius=3;
     public static int port=7777;
 

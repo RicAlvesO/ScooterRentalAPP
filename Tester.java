@@ -36,18 +36,18 @@ public class Tester {
 		//------------------------------------------------------------
 		
 		//Check For Scooters In Random Positions
-    	//startTimeF = System.nanoTime();
-		//make_operations(api, TN, OP, 0, V);
-    	//timeF = System.nanoTime();
-		//System.out.println("[CLOCK] "+TN*OP+" operações 'Procurar Disponiveis' finalizadas em " + (timeF - startTimeF) / 1000000 + " ms");
+    	startTimeF = System.nanoTime();
+		make_operations(api, TN, OP, 0, V);
+    	timeF = System.nanoTime();
+		System.out.println("[CLOCK] "+TN*OP+" operações 'Procurar Disponiveis' finalizadas em " + (timeF - startTimeF) / 1000000 + " ms");
 
         //------------------------------------------------------------
 
 		//Check For Rewards In Random Positions
-    	//startTimeF = System.nanoTime();
-		//make_operations(api, TN, OP, 1, V);
-    	//timeF = System.nanoTime();
-		//System.out.println("[CLOCK] "+TN*OP+" operações 'Procurar Recompensas' finalizadas em " + (timeF - startTimeF) / 1000000 + " ms");
+    	startTimeF = System.nanoTime();
+		make_operations(api, TN, OP, 1, V);
+    	timeF = System.nanoTime();
+		System.out.println("[CLOCK] "+TN*OP+" operações 'Procurar Recompensas' finalizadas em " + (timeF - startTimeF) / 1000000 + " ms");
 
         //------------------------------------------------------------
         
@@ -56,6 +56,14 @@ public class Tester {
 		make_operations(api, TN, OP, 2, V);
     	timeF = System.nanoTime();
 		System.out.println("[CLOCK] "+TN*OP+" operações 'Reservar Trotinete' (realizando a operação 'Entregar Trotinete' quando tem sucesso na reserva) finalizadas em " + (timeF - startTimeF) / 1000000 + " ms");
+
+        //------------------------------------------------------------
+
+		//Test Random Operations
+    	startTimeF = System.nanoTime();
+		make_operations(api, TN, OP, -1, V);
+    	timeF = System.nanoTime();
+		System.out.println("[CLOCK] "+TN*OP+" operações aleatórias finalizadas em " + (timeF - startTimeF) / 1000000 + " ms");
 
         //------------------------------------------------------------
 
